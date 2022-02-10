@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Property;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,12 +20,34 @@ class PropertyRepository extends ServiceEntityRepository
         parent::__construct($registry, Property::class);
     }
 
-    public function fidAllVisible()
+    /**
+     * @return Property[]
+     */
+
+    public function findAllVisible() : array
     {
-        return $this->createQueryBuilder('p')
-            ->where('p.sold = false')
+        return $this->findVisibleQuery ()
             ->getQuery()
             ->getResult();
+
+    }
+
+    /**
+     * @return Property[]
+     */
+
+    public function findLatest() : array
+    {
+        return $this->findVisibleQuery ()
+            ->setMaxResults(4)
+            ->getQuery()
+            ->getResult();
+    }
+
+    private function findVisibleQuery () : QueryBuilder
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.sold = false');
 
     }
 
@@ -56,4 +79,5 @@ class PropertyRepository extends ServiceEntityRepository
         ;
     }
     */
+
 }

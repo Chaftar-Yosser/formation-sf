@@ -6,5 +6,26 @@
         <h1>Agence lorem ipsum</h1>
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deserunt, quis aliquam unde sed maiores sit! Hic molestiae optio iste iure earum amet nostrum quaerat facere quae veniam maiores harum iusto aperiam vel inventore illo voluptatibus voluptates quo impedit voluptatum error vitae, omnis praesentium? Aperiam nulla non, nesciunt fuga rem perferendis alias et, temporibus, distinctio culpa unde a laborum libero ducimus. </p>
     </div>
+
+    <div class="container">
+        <h2>Les derniers biens</h2>
+        <div class="row flex">
+            {% for property in properties %}
+            <div class="col-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{ path('property.show' , {id: property.id , slug:property.slug}) }}">{{ property.title }}</a>
+                        </h5>
+                        <p class="card-text">{{ property.city }} ({{ property.postalcode }}) </p>
+                        <div class="text-primary" style="font-weight: bold;font-size: 2rem">{{ property.FormattedPrice }} £</div>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+
+        </div>
+    </div>
    
 {% endblock %}
