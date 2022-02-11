@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
     #[ORM\Entity(repositoryClass: PropertyRepository::class)]
+    #[UniqueEntity("title")]
     class Property
     {
         const HEAT =[
@@ -25,6 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\Length(min:5 , max:255)]
     private $title;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -32,6 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
     #[ORM\Column(type: 'integer')]
+    #[Assert\Range(min:10 , max:400)]
     private $surface;
 
     #[ORM\Column(type: 'integer')]
@@ -56,6 +59,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     private $address;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\Regex("/^[0-9]{5}$/")]
     private $postal_code;
 
     #[ORM\Column(type: 'boolean')]
