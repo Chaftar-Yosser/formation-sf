@@ -63,11 +63,12 @@ class AdminOptionController extends AbstractController
     #[Route('/{id}', name: 'admin.option.delete', methods: ['POST'])]
     public function delete(Request $request, Option $option, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('admin/delete'.$option->getId(), $request->request->get('_token'))) {
+
+        if ($this->isCsrfTokenValid('delete'.$option->getId(), $request->request->get('_token'))) {
             $entityManager->remove($option);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('option_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('admin.option.index', [], Response::HTTP_SEE_OTHER);
     }
 }
