@@ -9,12 +9,19 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Cocur\Slugify\Slugify;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 
-
+/**
+ * Class Property
+ * @Vich\Uploadable
+ */
     #[ORM\Entity(repositoryClass: PropertyRepository::class)]
     #[UniqueEntity("title")]
+
     class Property
     {
         const HEAT =[
@@ -26,6 +33,15 @@ use Symfony\Component\Validator\Constraints as Assert;
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
+
+    #[ORM\Column(type: 'string' , length: 255 )]
+    private $filename;
+
+    /**
+     * @var File
+     */
+    #[Vich\UploadableField(mapping: 'aaa' , fileNameProperty: 'filename')]
+    private File $imageFile;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\Length(min:5 , max:255)]
@@ -70,14 +86,16 @@ use Symfony\Component\Validator\Constraints as Assert;
     #[ORM\Column(type: 'datetime')]
     private $created_at ;
 
-    #[ORM\ManyToMany(targetEntity: Option::class, inversedBy: 'properties')]
+    #[ORM\ManyToMany(targetEntity: Option::class, inversedBy: 'images')]
     private $options;
+
+    #[ORM\Column(type: 'datetime')]
+    private $updated_at;
 
     public function __construct()
     {
         $this->created_at = new \DateTime();
         $this->options = new ArrayCollection();
-
     }
     
 
@@ -283,4 +301,55 @@ use Symfony\Component\Validator\Constraints as Assert;
 
         return $this;
     }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(\DateTimeInterface $updated_at): self
+    {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+        /**
+         * @return string|null
+         */
+        public function getFilename(): ?string
+        {
+            return $this->filename;
+        }
+
+        /**
+         * @param string|null $filename
+         * @return Property
+         */
+        public function setFilename(?string $filename): Property
+        {
+            $this->filename = $filename;
+            return $this;
+        }
+
+        /**
+         * @return File
+         */
+        public function getImageFile(): File
+        {
+            return $this->imageFile;
+        }
+
+        /**
+         * @param File $imageFile
+         * @return Property
+         */
+        public function setImageFile(File $imageFile): Property
+        {
+            $this->imageFile = $imageFile;
+            if ($this->imageFile instanceof UploadedFile) {
+                $this->updated_at = new \DateTime('now');
+            }
+            return $this;
+        }
 }

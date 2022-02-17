@@ -1,9 +1,12 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\Contact;
 use App\Entity\Property;
 use App\Entity\PropertySearch;
+use App\Form\ContactType;
 use App\Form\PropertySearchType;
+use App\Notification\ContactNotification;
 use App\Repository\PropertyRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -42,7 +45,7 @@ class PropertyController extends AbstractController{
 
         );
         return $this->render('property/index.html.twig' , [
-            'current_menu' => 'properties' ,
+            'current_menu' => 'images' ,
             'properties' => $properties ,
             'form' => $form->createView()
         ]);
@@ -51,20 +54,40 @@ class PropertyController extends AbstractController{
 
     /**
      * @Route("/biens/{slug}-{id}" , name="property.show", requirements={"slug": "[a-z0-9\-]*"})
+     * @param Property $property
+     * @param string $slug
+     * @param Request $request
+     * @param ContactNotification $notification
      * @return Response
      */
-    public function show(property $property , string $slug) : Response
+    public function show(property $property , string $slug, Request $request ,ContactNotification $notification) : Response
     {
+
         if($property->getSlug() !== $slug) {
             return $this->redirectToRoute('property.show' , [
                'id' => $property->getId() ,
                 'slug' => $property->getSlug()
             ], 301);
         }
+        $contact = new Contact();
+        $contact->setProperty($property);
+        $form = $this->createForm(ContactType::class, $contact);
+        $form->handleRequest($request); //gére la requette
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $notification->notify($contact);
+            $this->addFlash('success' , 'votre emeil a bien été envoyé');
+            return $this->redirectToRoute('property.show' , [
+                'id' => $property->getId() ,
+                'slug' => $property->getSlug()
+            ]);
+
+        }
 
        return $this->render('property/show.html.twig' ,[
             'property' => $property,
-            'current_menu' => 'properties'
+            'current_menu' => 'images',
+           'form' => $form->createView()
         ]);
 
     }
